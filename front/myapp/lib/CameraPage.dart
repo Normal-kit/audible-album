@@ -38,7 +38,7 @@ class _CamerapageState extends State<Camerapage> {
       final appDir = await getApplicationDocumentsDirectory();
       final fileName = basename(pickedFile.path);
       final savedImage = await tempImage.copy('${appDir.path}/$fileName');
-
+      print('이미지 저장 경로: ${savedImage.path}');
       setState(() {
         _imageFile = savedImage;
       });
@@ -150,7 +150,9 @@ class _CamerapageState extends State<Camerapage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/record');
+                                },
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: Size(100, 100),
                                   shape: RoundedRectangleBorder(
