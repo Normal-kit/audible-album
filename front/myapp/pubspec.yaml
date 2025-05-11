@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_sound: ^9.28.0
+  permission_handler: ^11.0.0
   image_picker: ^1.0.7
   http: ^0.13.6
 
