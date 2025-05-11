@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:myapp/PhotoExpandpage.dart';
 
 class Gallerypage extends StatefulWidget {
   const Gallerypage({super.key});
@@ -69,9 +70,24 @@ class _GallerypageState extends State<Gallerypage> {
                     mainAxisSpacing: 12,
                   ),
                   itemBuilder: (context, index) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(_imageFiles[index], fit: BoxFit.cover),
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (_) => PhotoExpandpage(
+                                  imageFile: _imageFiles[index],
+                                ),
+                          ),
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          _imageFiles[index],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     );
                   },
                 ),

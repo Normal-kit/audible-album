@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:myapp/CameraPage.dart';
 import 'package:myapp/GalleryPage.dart';
 import 'package:myapp/MainPage.dart';
-import 'package:myapp/PhotoExpandpage.dart';
 import 'package:myapp/Recordpage.dart';
 import 'package:myapp/RecordResultpage.dart';
 
@@ -21,7 +20,6 @@ class MyApp extends StatelessWidget {
         '/gallery': (context) => Gallerypage(),
         '/record': (context) => Recordpage(),
         '/recordresult': (context) => RecordResultpage(),
-        '/photoexpand': (context) => Photoexpandpage(),
       },
     );
   }
