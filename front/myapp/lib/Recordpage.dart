@@ -16,7 +16,7 @@ class Recordpage extends StatelessWidget {
               hint: '버튼을 두번클릭하면 녹음이 시작되고 다시 두번클릭하면 녹음이 중지됩니다.',
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/');
+                  Navigator.pushNamed(context, '/recordresult');
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: Size(350, 350),
