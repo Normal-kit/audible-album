@@ -110,7 +110,7 @@ class _RecordResultpageState extends State<RecordResultpage> {
               children: [
                 Semantics(
                   label: 'Re-record the audio',
-                  hint: 'Tapping this button will allow you to re-record the audio.',
+                  hint: '재녹음 버튼, 녹음 화면으로 돌아갑니다.',
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pushNamed(
@@ -132,8 +132,8 @@ class _RecordResultpageState extends State<RecordResultpage> {
                 Semantics(
                   label: _isPlaying ? 'Stop audio playback' : 'Play audio',
                   hint: _isPlaying
-                      ? 'Tapping this button will stop the audio playback.'
-                      : 'Tapping this button will play the recorded audio.',
+                      ? '재생을 중지합니다.'
+                      : '녹음된 파일을 재생합니다.',
                   child: ElevatedButton.icon(
                     onPressed: _playAudio,
                     icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
@@ -145,7 +145,7 @@ class _RecordResultpageState extends State<RecordResultpage> {
                 ),
                 Semantics(
                   label: 'Save the result',
-                  hint: 'Tapping this button will save the result to your device.',
+                  hint: '파일을 저장합니다.',
                   child: ElevatedButton.icon(
                     onPressed: _saveResult,
                     icon: const Icon(Icons.save),
