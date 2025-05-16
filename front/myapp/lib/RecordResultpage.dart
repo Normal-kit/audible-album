@@ -68,14 +68,14 @@ class _RecordResultpageState extends State<RecordResultpage> {
     };
 
     await file.writeAsString(jsonEncode(data));
-
+/*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Result saved at: ${file.path}'),
+        content: Text('íŒŒì¼ ì €ì¥ ìœ„ì¹˜: ${file.path}'),
         duration: const Duration(seconds: 4),
       ),
     );
-
+*/
     Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
@@ -100,63 +100,68 @@ class _RecordResultpageState extends State<RecordResultpage> {
             if (imagePath != null) Image.file(File(imagePath!)),
             const SizedBox(height: 16),
             if (gptResult != null)
-              Text('GPT Analysis Result: $gptResult', style: const TextStyle(fontSize: 16)),
+              Text('ì´ë¯¸ì§€ ë¶„ì„ ê²°ê³¼: $gptResult', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 16),
             if (timestamp != null)
-              Text('Recording Time: $timestamp', style: const TextStyle(fontSize: 14)),
+              Text('ë…¹ìŒ ì‹œê°„: $timestamp', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 24),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Semantics(
-                  label: 'Re-record the audio',
-                  hint: 'Àç³ìÀ½ ¹öÆ°, ³ìÀ½ È­¸éÀ¸·Î µ¹¾Æ°©´Ï´Ù.',
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/record',
-                        arguments: {
-                          'imagePath': imagePath,
-                          'gptResult': gptResult,
-                        },
-                      );
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Re-record'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                    ),
-                  ),
-                ),
-                Semantics(
-                  label: _isPlaying ? 'Stop audio playback' : 'Play audio',
-                  hint: _isPlaying
-                      ? 'Àç»ıÀ» ÁßÁöÇÕ´Ï´Ù.'
-                      : '³ìÀ½µÈ ÆÄÀÏÀ» Àç»ıÇÕ´Ï´Ù.',
-                  child: ElevatedButton.icon(
-                    onPressed: _playAudio,
-                    icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-                    label: Text(_isPlaying ? 'Stop' : 'Play'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                    ),
-                  ),
-                ),
-                Semantics(
-                  label: 'Save the result',
-                  hint: 'ÆÄÀÏÀ» ÀúÀåÇÕ´Ï´Ù.',
-                  child: ElevatedButton.icon(
-                    onPressed: _saveResult,
-                    icon: const Icon(Icons.save),
-                    label: const Text('Save'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  children: [
+    Semantics(
+      label: 'ì¬ë…¹ìŒ',
+      hint: 'ë…¹ìŒí™”ë©´ìœ¼ë¡œ ëŒì•„ê°‘ë‹ˆë‹¤',
+      button: true,
+      excludeSemantics: true,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            '/record',
+            arguments: {
+              'imagePath': imagePath,
+              'gptResult': gptResult,
+            },
+          );
+        },
+        icon: const Icon(Icons.refresh),
+        label: const Text('ì¬ë…¹ìŒ'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange,
+        ),
+      ),
+    ),
+    Semantics(
+      label: _isPlaying ? 'ì¬ìƒ ì¤‘ì§€' : 'ì¬ìƒ',
+      hint: _isPlaying ? 'ì¬ìƒì„ ì¤‘ì§€í•©ë‹ˆë‹¤.' : 'ì¬ìƒí•©ë‹ˆë‹¤.',
+      button: true,
+      excludeSemantics: true,
+      child: ElevatedButton.icon(
+        onPressed: _playAudio,
+        icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+        label: Text(_isPlaying ? 'ì¤‘ì§€' : 'ì¬ìƒ'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+        ),
+      ),
+    ),
+    Semantics(
+      label: 'ì €ì¥.',
+      hint: 'íŒŒì¼ì„ ì €ì¥í•©ë‹ˆë‹¤.',
+      button: true,
+      excludeSemantics: true,
+      child: ElevatedButton.icon(
+        onPressed: _saveResult,
+        icon: const Icon(Icons.save),
+        label: const Text('ì €ì¥'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+        ),
+      ),
+    ),
+  ],
+)
+,
           ],
         ),
       ),
