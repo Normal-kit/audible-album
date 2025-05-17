@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class Recordpage extends StatefulWidget {
   const Recordpage({super.key});
@@ -34,7 +35,6 @@ class _RecordpageState extends State<Recordpage> {
   Future<void> _startRecording() async {
     try {
       if (_recorder.isRecording) {
-        // 이미 녹음 중이면 무시
         print('이미 녹음 중입니다.');
         return;
       }
@@ -48,7 +48,8 @@ class _RecordpageState extends State<Recordpage> {
       }
 
       final directory = await getApplicationDocumentsDirectory();
-      _filePath = '${directory.path}/my_recording.aac';
+      final uuid = const Uuid().v4();
+      _filePath = '${directory.path}/$uuid.aac';
 
       await _recorder.startRecorder(toFile: _filePath, codec: Codec.aacADTS);
 

@@ -14,11 +14,14 @@ class Gallerypage extends StatefulWidget {
 
 class _GallerypageState extends State<Gallerypage> {
   List<String> _imagePaths = [];
+  List<String> _filteredImagePaths = []; // 필터링된 이미지 리스트
 
-  // 이미지 경로를 키로 하여 각각 값을 저장하는 Map들
-  Map<String, String> _imageDescriptions = {}; // imagePath -> GPT 결과
-  Map<String, String> _imageAudioPaths = {};   // imagePath -> audioPath
-  Map<String, String> _imageTimestamps = {};   // imagePath -> 녹음 시간
+  Map<String, String> _imageDescriptions = {};
+  Map<String, String> _imageAudioPaths = {};
+  Map<String, String> _imageTimestamps = {};
+
+  final TextEditingController _yearController = TextEditingController();
+  final TextEditingController _monthController = TextEditingController();
 
   @override
   void initState() {
@@ -46,27 +49,18 @@ class _GallerypageState extends State<Gallerypage> {
           final audioPath = decoded['audioPath'] as String?;
           final timestamp = decoded['timestamp'] as String?;
 
-          if (imagePath != null) {
-            // 이미지 파일이 실제로 존재하는지 체크
-            if (await File(imagePath).exists()) {
-              imagePaths.add(imagePath);
-
-              if (gptResult != null) {
-                descriptions[imagePath] = gptResult;
-              }
-              if (audioPath != null) {
-                audioPaths[imagePath] = audioPath;
-              }
-              if (timestamp != null) {
-                timestamps[imagePath] = timestamp;
-              }
-            }
+          if (imagePath != null && await File(imagePath).exists()) {
+            imagePaths.add(imagePath);
+            if (gptResult != null) descriptions[imagePath] = gptResult;
+            if (audioPath != null) audioPaths[imagePath] = audioPath;
+            if (timestamp != null) timestamps[imagePath] = timestamp;
           }
         }
       }
 
       setState(() {
         _imagePaths = imagePaths;
+        _filteredImagePaths = imagePaths; // 초기에는 전체 이미지 표시
         _imageDescriptions = descriptions;
         _imageAudioPaths = audioPaths;
         _imageTimestamps = timestamps;
@@ -74,6 +68,27 @@ class _GallerypageState extends State<Gallerypage> {
     } catch (e) {
       print('설명 및 이미지 로딩 실패: $e');
     }
+  }
+
+  void _applyFilter() {
+    final year = _yearController.text.trim();
+    final month = _monthController.text.trim().padLeft(2, '0');
+
+    if (year.isEmpty || month.isEmpty) {
+      setState(() {
+        _filteredImagePaths = _imagePaths;
+      });
+      return;
+    }
+
+    final filterKey = '$year-$month';
+
+    setState(() {
+      _filteredImagePaths = _imagePaths.where((path) {
+        final timestamp = _imageTimestamps[path];
+        return timestamp != null && timestamp.startsWith(filterKey);
+      }).toList();
+    });
   }
 
   @override
@@ -86,7 +101,6 @@ class _GallerypageState extends State<Gallerypage> {
       body: SafeArea(
         child: Column(
           children: [
-            // 상단 버튼들
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
@@ -96,31 +110,55 @@ class _GallerypageState extends State<Gallerypage> {
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const Spacer(),
-                  ElevatedButton(onPressed: () {}, child: const Text('년')),
+                  SizedBox(
+                    width: 80,
+                    child: TextField(
+                      controller: _yearController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: '년',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  ElevatedButton(onPressed: () {}, child: const Text('월')),
+                  SizedBox(
+                    width: 60,
+                    child: TextField(
+                      controller: _monthController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: '월',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _applyFilter,
+                    child: const Text('검색'),
+                  ),
                 ],
               ),
             ),
 
-            // 이미지 그리드
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: GridView.builder(
-                  itemCount: _imagePaths.length,
+                  itemCount: _filteredImagePaths.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                   ),
                   itemBuilder: (context, index) {
-                    final imagePath = _imagePaths[index];
+                    final imagePath = _filteredImagePaths[index];
                     final file = File(imagePath);
 
-                    final description =
-                        _imageDescriptions[imagePath] ?? '이미지 설명이 없습니다';
-
+                    final description = _imageDescriptions[imagePath] ?? '이미지 설명이 없습니다';
                     final audioPath = _imageAudioPaths[imagePath] ??
                         imagePath.replaceAll(RegExp(r'\.(jpg|jpeg|png)$'), '.aac');
 
