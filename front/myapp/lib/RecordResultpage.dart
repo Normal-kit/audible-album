@@ -72,14 +72,14 @@ class _RecordResultpageState extends State<RecordResultpage> {
 
     final resultFile = File('$appDir/$uuid.json');
     await resultFile.writeAsString(jsonEncode(result));
-
+/*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('파일 저장 위치: ${resultFile.path}'),
         duration: const Duration(seconds: 4),
       ),
     );
-
+*/
     Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
