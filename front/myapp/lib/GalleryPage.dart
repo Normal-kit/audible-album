@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,11 +14,13 @@ class Gallerypage extends StatefulWidget {
 
 class _GallerypageState extends State<Gallerypage> {
   List<File> _imageFiles = [];
+  Map<String, String> _imageDescriptions = {}; // 이미지 경로 -> 설명
 
   @override
   void initState() {
     super.initState();
     _loadSavedImages();
+    _loadDescriptions();
   }
 
   Future<void> _loadSavedImages() async {
@@ -35,13 +38,46 @@ class _GallerypageState extends State<Gallerypage> {
     });
   }
 
+  Future<void> _loadDescriptions() async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+
+      // app_flutter 폴더 내 모든 json 파일을 읽어 리스트에 추가
+      final files = dir.listSync();
+
+      Map<String, String> descriptions = {};
+
+      for (final file in files.whereType<File>()) {
+        if (extension(file.path).toLowerCase() == '.json') {
+          final content = await file.readAsString();
+          final decoded = jsonDecode(content);
+          final imagePath = decoded['imagePath'];
+          final gptResult = decoded['gptResult'];
+          if (imagePath != null && gptResult != null) {
+            descriptions[imagePath] = gptResult;
+          }
+        }
+      }
+
+      setState(() {
+        _imageDescriptions = descriptions;
+      });
+    } catch (e) {
+      print('설명 로딩 실패: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gallery'),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            //뒤로가기 + 년/월 버튼
+            // 상단 버튼들
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
@@ -58,7 +94,7 @@ class _GallerypageState extends State<Gallerypage> {
               ),
             ),
 
-            //저장된 이미지들을 2열 그리드로 보여주기
+            // 이미지 그리드
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -70,22 +106,23 @@ class _GallerypageState extends State<Gallerypage> {
                     mainAxisSpacing: 12,
                   ),
                   itemBuilder: (context, index) {
+                    final file = _imageFiles[index];
+                    final description =
+                        _imageDescriptions[file.path] ?? '이미지 설명이 없습니다';
+
                     return GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder:
-                                (_) => PhotoExpandpage(
-                                  imageFile: _imageFiles[index],
-                                ),
+                            builder: (_) => PhotoExpandpage(imageFile: file),
                           ),
                         );
                       },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          _imageFiles[index],
-                          fit: BoxFit.cover,
+                      child: Semantics(
+                        label: description,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(file, fit: BoxFit.cover),
                         ),
                       ),
                     );

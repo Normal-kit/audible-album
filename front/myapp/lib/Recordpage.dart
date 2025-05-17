@@ -32,12 +32,38 @@ class _RecordpageState extends State<Recordpage> {
   }
 
   Future<void> _startRecording() async {
-    final directory = await getApplicationDocumentsDirectory();
-    _filePath = '${directory.path}/my_recording.aac';
-    await _recorder.startRecorder(toFile: _filePath, codec: Codec.aacADTS);
-    setState(() {
-      _isRecording = true;
-    });
+    try {
+      if (_recorder.isRecording) {
+        // 이미 녹음 중이면 무시
+        print('이미 녹음 중입니다.');
+        return;
+      }
+
+      final status = await Permission.microphone.status;
+      if (!status.isGranted) {
+        final reqStatus = await Permission.microphone.request();
+        if (!reqStatus.isGranted) {
+          throw RecordingPermissionException("마이크 권한이 필요합니다.");
+        }
+      }
+
+      final directory = await getApplicationDocumentsDirectory();
+      _filePath = '${directory.path}/my_recording.aac';
+
+      await _recorder.startRecorder(toFile: _filePath, codec: Codec.aacADTS);
+
+      setState(() {
+        _isRecording = true;
+      });
+    } catch (e) {
+      print('녹음 시작 중 오류: $e');
+      setState(() {
+        _isRecording = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('녹음 시작에 실패했습니다: $e')));
+    }
   }
 
   Future<void> _stopRecording() async {
