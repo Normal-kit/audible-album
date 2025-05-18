@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class RecordResultpage extends StatefulWidget {
   const RecordResultpage({super.key});
@@ -58,24 +59,27 @@ class _RecordResultpageState extends State<RecordResultpage> {
 
   void _saveResult() async {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/saved_result.json');
+    final appDir = directory.path;
 
-    final data = {
+    final uuid = const Uuid().v4();
+
+    final result = {
       'imagePath': imagePath,
       'gptResult': gptResult,
       'audioPath': audioPath,
       'timestamp': timestamp,
     };
 
-    await file.writeAsString(jsonEncode(data));
-
+    final resultFile = File('$appDir/$uuid.json');
+    await resultFile.writeAsString(jsonEncode(result));
+    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Result saved at: ${file.path}'),
+        content: Text('파일 저장 위치: ${resultFile.path}'),
         duration: const Duration(seconds: 4),
       ),
     );
-
+*/
     Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
@@ -83,7 +87,6 @@ class _RecordResultpageState extends State<RecordResultpage> {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments as Map?;
 
-    // Only set values if they are null to prevent re-initialization
     if (imagePath == null && args != null) {
       imagePath = args['imagePath'] as String?;
       gptResult = args['gptResult'] as String?;
@@ -92,7 +95,7 @@ class _RecordResultpageState extends State<RecordResultpage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Result')),
+      appBar: AppBar(title: const Text('결과화면')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -100,17 +103,22 @@ class _RecordResultpageState extends State<RecordResultpage> {
             if (imagePath != null) Image.file(File(imagePath!)),
             const SizedBox(height: 16),
             if (gptResult != null)
-              Text('GPT Analysis Result: $gptResult', style: const TextStyle(fontSize: 16)),
+              Text(
+                '이미지 분석 결과: $gptResult',
+                style: const TextStyle(fontSize: 16),
+              ),
             const SizedBox(height: 16),
             if (timestamp != null)
-              Text('Recording Time: $timestamp', style: const TextStyle(fontSize: 14)),
+              Text('녹음 시간: $timestamp', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Semantics(
-                  label: 'Re-record the audio',
-                  hint: 'Tapping this button will allow you to re-record the audio.',
+                  label: '재녹음',
+                  hint: '녹음화면으로 돌아갑니다',
+                  button: true,
+                  excludeSemantics: true,
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pushNamed(
@@ -123,33 +131,35 @@ class _RecordResultpageState extends State<RecordResultpage> {
                       );
                     },
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Re-record'),
+                    label: const Text('재녹음'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                     ),
                   ),
                 ),
                 Semantics(
-                  label: _isPlaying ? 'Stop audio playback' : 'Play audio',
-                  hint: _isPlaying
-                      ? 'Tapping this button will stop the audio playback.'
-                      : 'Tapping this button will play the recorded audio.',
+                  label: _isPlaying ? '재생 중지' : '재생',
+                  hint: _isPlaying ? '재생을 중지합니다.' : '재생합니다.',
+                  button: true,
+                  excludeSemantics: true,
                   child: ElevatedButton.icon(
                     onPressed: _playAudio,
                     icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-                    label: Text(_isPlaying ? 'Stop' : 'Play'),
+                    label: Text(_isPlaying ? '중지' : '재생'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
                   ),
                 ),
                 Semantics(
-                  label: 'Save the result',
-                  hint: 'Tapping this button will save the result to your device.',
+                  label: '저장',
+                  hint: '파일을 저장합니다.',
+                  button: true,
+                  excludeSemantics: true,
                   child: ElevatedButton.icon(
                     onPressed: _saveResult,
                     icon: const Icon(Icons.save),
-                    label: const Text('Save'),
+                    label: const Text('저장'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                     ),
