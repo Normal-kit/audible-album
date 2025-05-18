@@ -84,10 +84,11 @@ class _GallerypageState extends State<Gallerypage> {
     final filterKey = '$year-$month';
 
     setState(() {
-      _filteredImagePaths = _imagePaths.where((path) {
-        final timestamp = _imageTimestamps[path];
-        return timestamp != null && timestamp.startsWith(filterKey);
-      }).toList();
+      _filteredImagePaths =
+          _imagePaths.where((path) {
+            final timestamp = _imageTimestamps[path];
+            return timestamp != null && timestamp.startsWith(filterKey);
+          }).toList();
     });
   }
 
@@ -158,18 +159,24 @@ class _GallerypageState extends State<Gallerypage> {
                     final imagePath = _filteredImagePaths[index];
                     final file = File(imagePath);
 
-                    final description = _imageDescriptions[imagePath] ?? '이미지 설명이 없습니다';
-                    final audioPath = _imageAudioPaths[imagePath] ??
-                        imagePath.replaceAll(RegExp(r'\.(jpg|jpeg|png)$'), '.aac');
+                    final description =
+                        _imageDescriptions[imagePath] ?? '이미지 설명이 없습니다';
+                    final audioPath =
+                        _imageAudioPaths[imagePath] ??
+                        imagePath.replaceAll(
+                          RegExp(r'\.(jpg|jpeg|png)$'),
+                          '.aac',
+                        );
 
                     return GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => PhotoExpandpage(
-                              imageFile: file,
-                              audioFilePath: audioPath,
-                            ),
+                            builder:
+                                (_) => PhotoExpandpage(
+                                  imageFile: file,
+                                  audioFilePath: audioPath,
+                                ),
                           ),
                         );
                       },
