@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
 
 class Recordpage extends StatefulWidget {
   const Recordpage({super.key});
@@ -33,38 +32,12 @@ class _RecordpageState extends State<Recordpage> {
   }
 
   Future<void> _startRecording() async {
-    try {
-      if (_recorder.isRecording) {
-        print('이미 녹음 중입니다.');
-        return;
-      }
-
-      final status = await Permission.microphone.status;
-      if (!status.isGranted) {
-        final reqStatus = await Permission.microphone.request();
-        if (!reqStatus.isGranted) {
-          throw RecordingPermissionException("마이크 권한이 필요합니다.");
-        }
-      }
-
-      final directory = await getApplicationDocumentsDirectory();
-      final uuid = const Uuid().v4();
-      _filePath = '${directory.path}/$uuid.aac';
-
-      await _recorder.startRecorder(toFile: _filePath, codec: Codec.aacADTS);
-
-      setState(() {
-        _isRecording = true;
-      });
-    } catch (e) {
-      print('녹음 시작 중 오류: $e');
-      setState(() {
-        _isRecording = false;
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('녹음 시작에 실패했습니다: $e')));
-    }
+    final directory = await getApplicationDocumentsDirectory();
+    _filePath = '${directory.path}/my_recording.aac';
+    await _recorder.startRecorder(toFile: _filePath, codec: Codec.aacADTS);
+    setState(() {
+      _isRecording = true;
+    });
   }
 
   Future<void> _stopRecording() async {
@@ -111,22 +84,18 @@ class _RecordpageState extends State<Recordpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Semantics(
-          label: '녹음 시작버튼',
-          hint: '한번탭하면 녹음을 시작하고 다시한번더 탭하면 녹음을 마칩니다.',
-          child: ElevatedButton(
-            onPressed: _toggleRecording,
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size(350, 350),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50.0),
-              ),
-              backgroundColor: _isRecording ? Colors.red : Colors.lightBlue,
+        child: ElevatedButton(
+          onPressed: _toggleRecording,
+          style: ElevatedButton.styleFrom(
+            fixedSize: const Size(350, 350),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50.0),
             ),
-            child: Text(
-              _isRecording ? '녹음 중지' : '녹음 시작',
-              style: const TextStyle(fontSize: 30.0, color: Colors.white),
-            ),
+            backgroundColor: _isRecording ? Colors.red : Colors.lightBlue,
+          ),
+          child: Text(
+            _isRecording ? '녹음 중지' : '녹음 시작',
+            style: const TextStyle(fontSize: 30.0, color: Colors.white),
           ),
         ),
       ),

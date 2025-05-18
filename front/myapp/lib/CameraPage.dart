@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:path/path.dart';
 
 class Camerapage extends StatefulWidget {
   const Camerapage({super.key});
@@ -15,7 +15,7 @@ class Camerapage extends StatefulWidget {
 
 class _CamerapageState extends State<Camerapage> {
   File? _imageFile;
-  String _gptResult = '\u200B';
+  String _gptResult = '이미지를 분석 중입니다...';
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class _CamerapageState extends State<Camerapage> {
 
   Future<void> _pickImageFromCamera() async {
     setState(() {
-      _gptResult;
+      _gptResult = '이미지를 분석 중입니다...';
     });
 
     final picker = ImagePicker();
@@ -34,7 +34,7 @@ class _CamerapageState extends State<Camerapage> {
     if (pickedFile != null) {
       final tempImage = File(pickedFile.path);
       final appDir = await getApplicationDocumentsDirectory();
-      final fileName = p.basename(pickedFile.path);
+      final fileName = basename(pickedFile.path);
       final savedImage = await tempImage.copy('${appDir.path}/$fileName');
 
       setState(() {
@@ -42,11 +42,6 @@ class _CamerapageState extends State<Camerapage> {
       });
 
       await _analyzeImageWithGPT(savedImage);
-    }
-    if (pickedFile == null) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      return;
     }
   }
 
@@ -82,132 +77,114 @@ class _CamerapageState extends State<Camerapage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-          _imageFile != null
-              ? Column(
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+      body: _imageFile != null
+          ? Column(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 100),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          _imageFile!,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 100.0),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Align(
+                      alignment: Alignment.topCenter,
                       child: Container(
-                        margin: const EdgeInsets.only(top: 100),
-                        child: ClipRRect(
+                        height: 150,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _imageFile!,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
+                        ),
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          _gptResult,
+                          style: const TextStyle(fontSize: 16),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 4,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 100.0),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Semantics(
-                          liveRegion: true,
-                          child: Container(
-                            height: 150,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              _gptResult,
-                              style: const TextStyle(fontSize: 16),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 4,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        bottom: 24,
-                        top: 12,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Semantics(
-                                button: true,
-                                label: '녹음',
-                                excludeSemantics: true,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/record',
-                                      arguments: {
-                                        'imagePath': _imageFile!.path,
-                                        'gptResult': _gptResult,
-                                      },
-                                    );
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16, right: 16, bottom: 24, top: 12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/record',
+                                  arguments: {
+                                    'imagePath': _imageFile!.path,
+                                    'gptResult': _gptResult,
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                    fixedSize: const Size(100, 100),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  child: const Text(
-                                    '녹음',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: const Size(100, 100),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                              child: const Text(
+                                '녹음',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
                                 ),
                               ),
-                              Semantics(
-                                button: true,
-                                label: '재촬영',
-                                excludeSemantics: true,
-                                child: ElevatedButton(
-                                  onPressed: _pickImageFromCamera,
-                                  style: ElevatedButton.styleFrom(
-                                    fixedSize: const Size(100, 100),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                  child: const Text(
-                                    '재촬영',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                            ),
+                            ElevatedButton(
+                              onPressed: _pickImageFromCamera,
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: const Size(100, 100),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                backgroundColor: Colors.blue,
+                              ),
+                              child: const Text(
+                                '재촬영',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              )
-              : const Center(child: Text('로딩중...')),
+                ),
+              ],
+            )
+          : const Center(child: Text('이미지를 불러오는 중...')),
     );
   }
 }
