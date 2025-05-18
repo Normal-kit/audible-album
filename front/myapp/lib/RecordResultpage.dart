@@ -167,6 +167,62 @@ class _RecordResultpageState extends State<RecordResultpage> {
                 ),
               ],
             ),
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  children: [
+    Semantics(
+      label: '재녹음',
+      hint: '녹음화면으로 돌아갑니다',
+      button: true,
+      excludeSemantics: true,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            '/record',
+            arguments: {
+              'imagePath': imagePath,
+              'gptResult': gptResult,
+            },
+          );
+        },
+        icon: const Icon(Icons.refresh),
+        label: const Text('재녹음'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange,
+        ),
+      ),
+    ),
+    Semantics(
+      label: _isPlaying ? '재생 중지' : '재생',
+      hint: _isPlaying ? '재생을 중지합니다.' : '재생합니다.',
+      button: true,
+      excludeSemantics: true,
+      child: ElevatedButton.icon(
+        onPressed: _playAudio,
+        icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+        label: Text(_isPlaying ? '중지' : '재생'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+        ),
+      ),
+    ),
+    Semantics(
+      label: '저장.',
+      hint: '파일을 저장합니다.',
+      button: true,
+      excludeSemantics: true,
+      child: ElevatedButton.icon(
+        onPressed: _saveResult,
+        icon: const Icon(Icons.save),
+        label: const Text('저장'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+        ),
+      ),
+    ),
+  ],
+)
+,
           ],
         ),
       ),
