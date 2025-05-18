@@ -72,7 +72,7 @@ class _RecordResultpageState extends State<RecordResultpage> {
 
     final resultFile = File('$appDir/$uuid.json');
     await resultFile.writeAsString(jsonEncode(result));
-/*
+    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('파일 저장 위치: ${resultFile.path}'),
@@ -95,7 +95,7 @@ class _RecordResultpageState extends State<RecordResultpage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Result')),
+      appBar: AppBar(title: const Text('결과화면')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

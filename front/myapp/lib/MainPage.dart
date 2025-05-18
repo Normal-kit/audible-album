@@ -14,6 +14,7 @@ class MainPage extends StatelessWidget {
               button: true,
               label: '카메라',
               hint: '두 번 탭하여 카메라를 실행하세요',
+              excludeSemantics: true,
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/camera');
@@ -34,6 +35,7 @@ class MainPage extends StatelessWidget {
             SizedBox(height: 50.0),
             Semantics(
               button: true,
+              excludeSemantics: true,
               label: '갤러리',
               hint: '두 번 탭하여 갤러리를 실행하세요',
               child: ElevatedButton(

@@ -84,10 +84,11 @@ class _GallerypageState extends State<Gallerypage> {
     final filterKey = '$year-$month';
 
     setState(() {
-      _filteredImagePaths = _imagePaths.where((path) {
-        final timestamp = _imageTimestamps[path];
-        return timestamp != null && timestamp.startsWith(filterKey);
-      }).toList();
+      _filteredImagePaths =
+          _imagePaths.where((path) {
+            final timestamp = _imageTimestamps[path];
+            return timestamp != null && timestamp.startsWith(filterKey);
+          }).toList();
     });
   }
 
@@ -105,40 +106,54 @@ class _GallerypageState extends State<Gallerypage> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.of(context).pop(),
+                  Semantics(
+                    excludeSemantics: true,
+                    label: '뒤로가기',
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ),
                   const Spacer(),
                   SizedBox(
                     width: 80,
-                    child: TextField(
-                      controller: _yearController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: '년',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Semantics(
+                      label: '년도 숫자만 입력해주세요',
+                      child: TextField(
+                        controller: _yearController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: '년',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
                     width: 60,
-                    child: TextField(
-                      controller: _monthController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: '월',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Semantics(
+                      label: '월 숫자만 입력해주세요',
+                      child: TextField(
+                        controller: _monthController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: '월',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _applyFilter,
-                    child: const Text('검색'),
+                  Semantics(
+                    excludeSemantics: true,
+                    label: '입력한 년도와 월로 필터링합니다',
+                    child: ElevatedButton(
+                      onPressed: _applyFilter,
+                      child: const Text('검색'),
+                    ),
                   ),
                 ],
               ),
@@ -158,20 +173,32 @@ class _GallerypageState extends State<Gallerypage> {
                     final imagePath = _filteredImagePaths[index];
                     final file = File(imagePath);
 
-                    final description = _imageDescriptions[imagePath] ?? '이미지 설명이 없습니다';
-                    final audioPath = _imageAudioPaths[imagePath] ??
-                        imagePath.replaceAll(RegExp(r'\.(jpg|jpeg|png)$'), '.aac');
+                    final description =
+                        _imageDescriptions[imagePath] ?? '이미지 설명이 없습니다';
+                    final audioPath =
+                        _imageAudioPaths[imagePath] ??
+                        imagePath.replaceAll(
+                          RegExp(r'\.(jpg|jpeg|png)$'),
+                          '.aac',
+                        );
 
                     return GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => PhotoExpandpage(
-                              imageFile: file,
-                              audioFilePath: audioPath,
-                            ),
-                          ),
-                        );
+                        Navigator.of(context)
+                            .push(
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => PhotoExpandpage(
+                                      imageFile: file,
+                                      audioFilePath: audioPath,
+                                    ),
+                              ),
+                            )
+                            .then((deleted) {
+                              if (deleted == true) {
+                                _loadDescriptionsAndImages(); // 삭제 후 새로고침
+                              }
+                            });
                       },
                       child: Semantics(
                         label: description,
