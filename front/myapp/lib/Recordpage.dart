@@ -113,20 +113,11 @@ class _RecordpageState extends State<Recordpage> {
       body: Center(
         child: Semantics(
           label: '녹음 시작버튼',
-          hint: '한번탭하면 녹음을 시작하고 다시한번더 탭하면 녹음을 마칩니다.',
-          child: ElevatedButton(
+          hint: '지금 어떤 느낌인지 말해볼까요? 한번탭하면 녹음을 시작하고 다시한번더 탭하면 녹음을 마칩니다.',
+          child: IconButton(
+            icon: Image.asset('assets/images/mic.png', width: 250, height: 250),
             onPressed: _toggleRecording,
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size(350, 350),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50.0),
-              ),
-              backgroundColor: _isRecording ? Colors.red : Colors.lightBlue,
-            ),
-            child: Text(
-              _isRecording ? '녹음 중지' : '녹음 시작',
-              style: const TextStyle(fontSize: 30.0, color: Colors.white),
-            ),
+            padding: EdgeInsets.all(100.0),
           ),
         ),
       ),

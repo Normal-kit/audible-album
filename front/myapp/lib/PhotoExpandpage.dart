@@ -35,16 +35,6 @@ class _PhotoExpandpageState extends State<PhotoExpandpage> {
     setState(() {
       _isPlayerReady = true;
     });
-
-    // audioFilePath 스낵바로 보여주기
-    // if (mounted) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text('오디오 파일 경로: ${widget.audioFilePath}'),
-    //       duration: const Duration(seconds: 3),
-    //     ),
-    //   );
-    // }
   }
 
   @override
@@ -190,7 +180,7 @@ class _PhotoExpandpageState extends State<PhotoExpandpage> {
                                         Semantics(
                                           button: true,
                                           excludeSemantics: true,
-                                          label: '삭제 취소 버튼입니다',
+                                          label: '취소합니다',
                                           child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.grey,

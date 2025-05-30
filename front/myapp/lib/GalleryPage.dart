@@ -96,7 +96,15 @@ class _GallerypageState extends State<Gallerypage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gallery'),
+        leading: Semantics(
+          label: '뒤로가기',
+          excludeSemantics: true,
+          child: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
+        title: const Text('갤러리'),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -106,14 +114,6 @@ class _GallerypageState extends State<Gallerypage> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
-                  Semantics(
-                    excludeSemantics: true,
-                    label: '뒤로가기',
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ),
                   const Spacer(),
                   SizedBox(
                     width: 80,
@@ -148,6 +148,7 @@ class _GallerypageState extends State<Gallerypage> {
                   ),
                   const SizedBox(width: 8),
                   Semantics(
+                    button: true,
                     excludeSemantics: true,
                     label: '입력한 년도와 월로 필터링합니다',
                     child: ElevatedButton(

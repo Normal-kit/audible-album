@@ -96,76 +96,60 @@ class _RecordResultpageState extends State<RecordResultpage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('결과화면')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (imagePath != null) Image.file(File(imagePath!)),
-            const SizedBox(height: 16),
-            if (gptResult != null)
-              Text(
-                '이미지 분석 결과: $gptResult',
-                style: const TextStyle(fontSize: 16),
+            Semantics(
+              label: '재녹음',
+              hint: '녹음화면으로 돌아갑니다',
+              button: true,
+              excludeSemantics: true,
+              child: IconButton(
+                icon: Image.asset(
+                  'assets/images/mic.png',
+                  width: 150,
+                  height: 150,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/record',
+                    arguments: {'imagePath': imagePath, 'gptResult': gptResult},
+                  );
+                },
+                padding: EdgeInsets.all(50.0),
               ),
-            const SizedBox(height: 16),
-            if (timestamp != null)
-              Text('녹음 시간: $timestamp', style: const TextStyle(fontSize: 14)),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Semantics(
-                  label: '재녹음',
-                  hint: '녹음화면으로 돌아갑니다',
-                  button: true,
-                  excludeSemantics: true,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/record',
-                        arguments: {
-                          'imagePath': imagePath,
-                          'gptResult': gptResult,
-                        },
-                      );
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('재녹음'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                    ),
-                  ),
+            ),
+            Semantics(
+              label: _isPlaying ? '중지' : '재생',
+              hint: _isPlaying ? '중지합니다.' : '재생합니다.',
+              button: true,
+              excludeSemantics: true,
+              child: IconButton(
+                icon: Image.asset(
+                  'assets/images/play_stop.png',
+                  width: 130,
+                  height: 130,
                 ),
-                Semantics(
-                  label: _isPlaying ? '재생 중지' : '재생',
-                  hint: _isPlaying ? '재생을 중지합니다.' : '재생합니다.',
-                  button: true,
-                  excludeSemantics: true,
-                  child: ElevatedButton.icon(
-                    onPressed: _playAudio,
-                    icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-                    label: Text(_isPlaying ? '중지' : '재생'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                    ),
-                  ),
+                onPressed: _playAudio,
+                padding: EdgeInsets.all(50.0),
+              ),
+            ),
+            Semantics(
+              label: '저장',
+              hint: '파일을 저장하고 메인화면으로 돌아갑니다',
+              button: true,
+              excludeSemantics: true,
+              child: IconButton(
+                icon: Image.asset(
+                  'assets/images/save.png',
+                  width: 150,
+                  height: 150,
                 ),
-                Semantics(
-                  label: '저장',
-                  hint: '파일을 저장합니다.',
-                  button: true,
-                  excludeSemantics: true,
-                  child: ElevatedButton.icon(
-                    onPressed: _saveResult,
-                    icon: const Icon(Icons.save),
-                    label: const Text('저장'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
+                onPressed: _saveResult,
+                padding: EdgeInsets.all(50.0),
+              ),
             ),
           ],
         ),
