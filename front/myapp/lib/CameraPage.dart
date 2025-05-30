@@ -16,6 +16,7 @@ class Camerapage extends StatefulWidget {
 class _CamerapageState extends State<Camerapage> {
   File? _imageFile;
   String _gptResult = '\u200B';
+  bool check = false;
 
   @override
   void initState() {
@@ -65,16 +66,38 @@ class _CamerapageState extends State<Camerapage> {
         final description = data['data']?['description'];
 
         setState(() {
-          _gptResult = description ?? '설명을 가져올 수 없습니다.';
+          _gptResult = description ?? '오류가 발생했습니다 메인화면으로 돌아갑니다';
+          if (description == null) {
+            check = true;
+            Future.delayed(Duration(seconds: 3), () {
+              Navigator.of(context).pop();
+            });
+          }
         });
       } else {
         setState(() {
-          _gptResult = '분석 실패: ${response.statusCode}';
+          _gptResult = '오류가 발생했습니다 메인화면으로 돌아갑니다';
+          check = true;
+          Future.delayed(Duration(seconds: 3), () {
+            Navigator.of(context).pop();
+          });
         });
       }
     } catch (e) {
       setState(() {
-        _gptResult = '에러 발생: $e';
+        if (e.toString() == 'Connection failed') {
+          _gptResult = '네트워크를 연결해주세요 메인화면으로 돌아갑니다';
+          check = true;
+          Future.delayed(Duration(seconds: 3), () {
+            Navigator.of(context).pop();
+          });
+        } else {
+          _gptResult = '오류가 발생했습니다 메인화면으로 돌아갑니다';
+          check = true;
+          Future.delayed(Duration(seconds: 3), () {
+            Navigator.of(context).pop();
+          });
+        }
       });
     }
   }
@@ -105,7 +128,7 @@ class _CamerapageState extends State<Camerapage> {
                   ),
                   const SizedBox(height: 100.0),
                   Expanded(
-                    flex: 3,
+                    flex: 2,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Align(
@@ -138,68 +161,54 @@ class _CamerapageState extends State<Camerapage> {
                         left: 16,
                         right: 16,
                         bottom: 24,
-                        top: 12,
+                        top: 10,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Semantics(
-                                button: true,
-                                label: '녹음',
-                                excludeSemantics: true,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/record',
-                                      arguments: {
-                                        'imagePath': _imageFile!.path,
-                                        'gptResult': _gptResult,
-                                      },
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    fixedSize: const Size(100, 100),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
+                          AbsorbPointer(
+                            absorbing: check,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Semantics(
+                                  button: true,
+                                  label: '녹음',
+                                  hint: '녹음화면으로 넘어갑니다',
+                                  excludeSemantics: true,
+                                  child: IconButton(
+                                    icon: Image.asset(
+                                      'assets/images/mic.png',
+                                      width: 100,
+                                      height: 100,
                                     ),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  child: const Text(
-                                    '녹음',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/record',
+                                        arguments: {
+                                          'imagePath': _imageFile!.path,
+                                          'gptResult': _gptResult,
+                                        },
+                                      );
+                                    },
                                   ),
                                 ),
-                              ),
-                              Semantics(
-                                button: true,
-                                label: '재촬영',
-                                excludeSemantics: true,
-                                child: ElevatedButton(
-                                  onPressed: _pickImageFromCamera,
-                                  style: ElevatedButton.styleFrom(
-                                    fixedSize: const Size(100, 100),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
+                                Semantics(
+                                  button: true,
+                                  label: '재촬영',
+                                  excludeSemantics: true,
+                                  child: IconButton(
+                                    icon: Image.asset(
+                                      'assets/images/repeat_camera.png',
+                                      width: 100,
+                                      height: 100,
                                     ),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                  child: const Text(
-                                    '재촬영',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
+                                    onPressed: _pickImageFromCamera,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
