@@ -115,7 +115,11 @@ class _RecordpageState extends State<Recordpage> {
           label: '녹음 시작버튼',
           hint: '지금 어떤 느낌인지 말해볼까요? 한번탭하면 녹음을 시작하고 다시한번더 탭하면 녹음을 마칩니다.',
           child: IconButton(
-            icon: Image.asset('assets/images/mic.png', width: 250, height: 250),
+            icon: Image.asset(
+              _isRecording ? 'assets/images/mic2.png' : 'assets/images/mic.png',
+              width: 250,
+              height: 250,
+            ),
             onPressed: _toggleRecording,
             padding: EdgeInsets.all(100.0),
           ),

@@ -16,7 +16,6 @@ class Camerapage extends StatefulWidget {
 class _CamerapageState extends State<Camerapage> {
   File? _imageFile;
   String _gptResult = '\u200B';
-  bool check = false;
 
   @override
   void initState() {
@@ -26,7 +25,7 @@ class _CamerapageState extends State<Camerapage> {
 
   Future<void> _pickImageFromCamera() async {
     setState(() {
-      _gptResult;
+      _gptResult = '\u200B';
     });
 
     final picker = ImagePicker();
@@ -51,6 +50,67 @@ class _CamerapageState extends State<Camerapage> {
     }
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: null,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                liveRegion: true,
+                container: true,
+                child: Text(message, style: TextStyle(fontSize: 16)),
+              ),
+
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Semantics(
+                    button: true,
+                    label: "재시도합니다",
+                    excludeSemantics: true,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(120, 48),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        if (_imageFile != null) {
+                          _analyzeImageWithGPT(_imageFile!);
+                        }
+                      },
+                      child: Text('재시도'),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Semantics(
+                    button: true,
+                    label: '메인화면으로 이동합니다',
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(120, 48),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('메인화면으로'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _analyzeImageWithGPT(File image) async {
     final uri = Uri.parse('http://223.130.160.126:8000/upload/photo');
 
@@ -66,37 +126,21 @@ class _CamerapageState extends State<Camerapage> {
         final description = data['data']?['description'];
 
         setState(() {
-          _gptResult = description ?? '오류가 발생했습니다 메인화면으로 돌아갑니다';
+          _gptResult = description;
           if (description == null) {
-            check = true;
-            Future.delayed(Duration(seconds: 3), () {
-              Navigator.of(context).pop();
-            });
+            _showErrorDialog('분석에 실패했습니다. 다시 시도하시겠습니까?');
           }
         });
       } else {
-        setState(() {
-          _gptResult = '오류가 발생했습니다 메인화면으로 돌아갑니다';
-          check = true;
-          Future.delayed(Duration(seconds: 3), () {
-            Navigator.of(context).pop();
-          });
-        });
+        setState(() {});
+        _showErrorDialog('서버 오류가 발생했습니다. 다시 시도하시겠습니까?');
       }
     } catch (e) {
       setState(() {
         if (e.toString() == 'Connection failed') {
-          _gptResult = '네트워크를 연결해주세요 메인화면으로 돌아갑니다';
-          check = true;
-          Future.delayed(Duration(seconds: 3), () {
-            Navigator.of(context).pop();
-          });
+          _showErrorDialog('네트워크에 연결되지 않았습니다. 다시 시도하시겠습니까?');
         } else {
-          _gptResult = '오류가 발생했습니다 메인화면으로 돌아갑니다';
-          check = true;
-          Future.delayed(Duration(seconds: 3), () {
-            Navigator.of(context).pop();
-          });
+          _showErrorDialog('분석에 실패했습니다. 다시 시도하시겠습니까?');
         }
       });
     }
@@ -166,49 +210,46 @@ class _CamerapageState extends State<Camerapage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          AbsorbPointer(
-                            absorbing: check,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Semantics(
-                                  button: true,
-                                  label: '녹음',
-                                  hint: '녹음화면으로 넘어갑니다',
-                                  excludeSemantics: true,
-                                  child: IconButton(
-                                    icon: Image.asset(
-                                      'assets/images/mic.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/record',
-                                        arguments: {
-                                          'imagePath': _imageFile!.path,
-                                          'gptResult': _gptResult,
-                                        },
-                                      );
-                                    },
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Semantics(
+                                button: true,
+                                label: '녹음',
+                                hint: '녹음화면으로 넘어갑니다',
+                                excludeSemantics: true,
+                                child: IconButton(
+                                  icon: Image.asset(
+                                    'assets/images/mic.png',
+                                    width: 100,
+                                    height: 100,
                                   ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/record',
+                                      arguments: {
+                                        'imagePath': _imageFile!.path,
+                                        'gptResult': _gptResult,
+                                      },
+                                    );
+                                  },
                                 ),
-                                Semantics(
-                                  button: true,
-                                  label: '재촬영',
-                                  excludeSemantics: true,
-                                  child: IconButton(
-                                    icon: Image.asset(
-                                      'assets/images/repeat_camera.png',
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                    onPressed: _pickImageFromCamera,
+                              ),
+                              Semantics(
+                                button: true,
+                                label: '재촬영',
+                                excludeSemantics: true,
+                                child: IconButton(
+                                  icon: Image.asset(
+                                    'assets/images/repeat_camera.png',
+                                    width: 100,
+                                    height: 100,
                                   ),
+                                  onPressed: _pickImageFromCamera,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
